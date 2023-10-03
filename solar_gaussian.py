@@ -1,11 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import cm
 from noise import snoise2
+from scipy.ndimage import gaussian_filter
 
 # Parámetros del mapa
-width = 800  # Ancho del mapa
-height = 600  # Altura del mapa
+width = 1000  # Ancho del mapa
+height = 1000  # Altura del mapa
 scale = 100.0  # Escala del ruido
 octaves = 6  # Número de octavas para el ruido de Perlin
 persistence = 0.5  # Persistencia del ruido de Perlin
@@ -42,25 +42,27 @@ def assign_irradiance(value):
     else:
         return 2500  # Irradiancia muy alta para áreas con ruido muy positivo
 
-
 # Asignar valores de irradiancia solar al mapa de ruido de Perlin
 irradiance_map = np.vectorize(assign_irradiance)(world)
 
-# Crear una representación 3D del mapa
-fig, ax = plt.subplots(subplot_kw={'projection': '3d'}, figsize=(10, 8))
-X = np.arange(0, width, 1)
-Y = np.arange(0, height, 1)
-X, Y = np.meshgrid(X, Y)
-Z = irradiance_map
+# Crear la visualización del mapa ponderado
+plt.figure(figsize=(10, 8))
+plt.imshow(irradiance_map, cmap='viridis', extent=[0, width, 0, height])
+plt.colorbar(label='Irradiancia Solar (W/m^2)')
+plt.title('Mapa de Ruido de Perlin Ponderado con Irradiancia Solar')
+plt.xlabel('X')
+plt.ylabel('Y')
 
-# Configurar el mapa de colores en 3D
-surf = ax.plot_surface(X, Y, Z, cmap=cm.viridis,
-                       linewidth=0, antialiased=False)
-fig.colorbar(surf, shrink=0.5, aspect=5)
-ax.set_title('Mapa de Ruido de Perlin Ponderado con Irradiancia Solar (3D)')
-ax.set_xlabel('X')
-ax.set_ylabel('Y')
-ax.set_zlabel('Irradiancia Solar (W/m^2)')
+# Aplicar un filtro de convolución gaussiano para suavizar la matriz 'world'
+sigma = 5.0  # Parámetro de suavizado, ajusta según sea necesario
+smoothed_world = gaussian_filter(irradiance_map, sigma)
 
-# Mostrar el mapa en 3D
+# Visualizar el mapa suavizado
+plt.figure(figsize=(10, 8))
+plt.imshow(smoothed_world, cmap='viridis', extent=[0, width, 0, height])
+plt.colorbar(label='Valor Suavizado')
+plt.title('Mapa de Ruido de Perlin Suavizado')
+plt.xlabel('X')
+plt.ylabel('Y')
+
 plt.show()

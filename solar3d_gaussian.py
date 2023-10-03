@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from noise import snoise2
+from scipy.ndimage import gaussian_filter
 
 # Parámetros del mapa
 width = 800  # Ancho del mapa
@@ -61,6 +62,28 @@ ax.set_title('Mapa de Ruido de Perlin Ponderado con Irradiancia Solar (3D)')
 ax.set_xlabel('X')
 ax.set_ylabel('Y')
 ax.set_zlabel('Irradiancia Solar (W/m^2)')
+
+
+# Aplicar un filtro de convolución gaussiano para suavizar la matriz 'world'
+sigma = 8.0  # Parámetro de suavizado, ajusta según sea necesario
+smoothed_world = gaussian_filter(irradiance_map, sigma)
+
+# Crear una representación 3D del mapa
+fig, ax = plt.subplots(subplot_kw={'projection': '3d'}, figsize=(10, 8))
+X = np.arange(0, width, 1)
+Y = np.arange(0, height, 1)
+X, Y = np.meshgrid(X, Y)
+Z = smoothed_world
+
+# Configurar el mapa de colores en 3D
+surf = ax.plot_surface(X, Y, Z, cmap=cm.viridis,
+                       linewidth=0, antialiased=False)
+fig.colorbar(surf, shrink=0.5, aspect=5)
+ax.set_title('Mapa de Ruido de Perlin Ponderado con Irradiancia Solar Suavizado (3D)')
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Irradiancia Solar (W/m^2)')
+
 
 # Mostrar el mapa en 3D
 plt.show()

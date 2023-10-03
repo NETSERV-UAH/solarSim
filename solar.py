@@ -30,8 +30,12 @@ for y in range(height):
 def assign_irradiance(value):
     if value < -0.5:
         return 1000  # Irradiancia baja para áreas con ruido muy negativo
+    elif value < -0.25:
+        return 1250  # Irradiancia moderada para áreas con ruido negativo
     elif value < 0.0:
         return 1500  # Irradiancia moderada para áreas con ruido negativo
+    elif value < 0.25:
+        return 1750  # Irradiancia moderada para áreas con ruido negativo
     elif value < 0.5:
         return 2000  # Irradiancia alta para áreas con ruido positivo
     else:
